@@ -1,0 +1,34 @@
+{
+  "Provider": "linode",
+  "CheckID": "storage_volume_encryption_enabled",
+  "CheckTitle": "Block Storage volume has disk encryption enabled",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "NotDefined",
+  "ResourceGroup": "storage",
+  "Description": "Linode **Block Storage volume has disk encryption enabled**.",
+  "Risk": "Risk if not configured.",
+  "RelatedUrl": "",
+  "AdditionalURLs": [],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Review the storage configuration.",
+      "Url": "https://hub.prowler.com/check/storage_volume_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,36 @@
+{
+  "Provider": "linode",
+  "CheckID": "databases_disk_encryption_enabled",
+  "CheckTitle": "Managed Database has disk encryption enabled",
+  "CheckType": [],
+  "ServiceName": "databases",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "NotDefined",
+  "ResourceGroup": "database",
+  "Description": "Linode **Managed Database has disk encryption enabled**.",
+  "Risk": "Risk if not configured.",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://techdocs.akamai.com/cloud-computing/docs/managed-databases"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Review the databases configuration.",
+      "Url": "https://hub.prowler.com/check/databases_disk_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

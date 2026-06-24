@@ -17,7 +17,7 @@ Linode support in Prowler is community-maintained. For commercial support or to 
 Set up authentication for Linode with the [Linode Authentication](/user-guide/providers/linode/authentication) guide before starting:
 
 - Create a Linode Personal Access Token with read-only permissions
-- The token requires at minimum: `account:read_only`, `linodes:read_only`, and `firewall:read_only` scopes
+- The token requires at minimum: `account:read_only`, `linodes:read_only`, `firewall:read_only`, `nodebalancers:read_only`, `volumes:read_only`, `object_storage:read_only`, `lke:read_only`, and `databases:read_only` scopes
 
 ## Prowler CLI
 
@@ -56,6 +56,8 @@ Prowler for Linode currently supports the following services:
 
 | Service | Description |
 |---------|-------------|
-| `administration` | Account administration includes users and access controls such as two-factor authentication |
-| `compute` | Compute includes Linode instances and their workload configuration |
-| `networking` | Networking includes Cloud Firewalls and their stateful network rules |
+| `administration` | Account administration includes users, access controls, and account-level settings |
+| `compute` | Compute includes Linode instances and LKE (Kubernetes) clusters |
+| `databases` | Managed Databases including MySQL and PostgreSQL instances |
+| `networking` | Networking includes Cloud Firewalls, NodeBalancers, and their configurations |
+| `storage` | Storage includes Block Storage volumes and Object Storage buckets and keys |

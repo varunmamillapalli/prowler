@@ -191,3 +191,138 @@ class TestLinodeNetworkingService:
         assert len(service.firewalls) == 1
         assert service.firewalls[0].label == "broken-fw"
         assert len(service.firewalls[0].inbound_rules) == 0
+
+
+def _mock_nodebalancer(
+    id=1,
+    label="my-nb",
+    region="us-east",
+    status="running",
+    configs=None,
+    firewalls=None,
+    tags=None,
+):
+    nb = MagicMock()
+    nb.id = id
+    nb.label = label
+    region_mock = MagicMock()
+    region_mock.id = region
+    nb.region = region_mock
+    nb.status = status
+    nb.tags = tags or []
+
+    # configs
+    nb.configs = configs or []
+
+    # firewalls
+    nb.firewalls.return_value = firewalls or []
+    return nb
+
+
+def _mock_nb_config(
+    id=1,
+    port=443,
+    protocol="https",
+    algorithm="roundrobin",
+    stickiness="none",
+    check="none",
+    cipher_suite="recommended",
+    proxy_protocol="none",
+    ssl_commonname="example.com",
+    ssl_fingerprint="AA:BB:CC",
+):
+    cfg = MagicMock()
+    cfg.id = id
+    cfg.port = port
+    cfg.protocol = protocol
+    cfg.algorithm = algorithm
+    cfg.stickiness = stickiness
+    cfg.check = check
+    cfg.cipher_suite = cipher_suite
+    cfg.proxy_protocol = proxy_protocol
+    cfg.ssl_commonname = ssl_commonname
+    cfg.ssl_fingerprint = ssl_fingerprint
+    return cfg
+
+
+def _build_nb_service(nb_return=None, nb_side_effect=None):
+    """Build a NetworkingService with a mock for client.nodebalancers()."""
+    service = object.__new__(NetworkingService)
+    service.firewalls = []
+    service.nodebalancers = []
+
+    nb_callable = MagicMock()
+    if nb_side_effect:
+        nb_callable.side_effect = nb_side_effect
+    else:
+        nb_callable.return_value = nb_return or []
+
+    client_mock = MagicMock()
+    client_mock.nodebalancers = nb_callable
+    service.client = client_mock
+    return service
+
+
+class TestLinodeNetworkingServiceNodeBalancers:
+    def test_describe_nodebalancers_parses_correctly(self):
+        configs = [_mock_nb_config(id=1, port=443, protocol="https")]
+        mock_nbs = [
+            _mock_nodebalancer(
+                id=1,
+                label="prod-nb",
+                region="us-east",
+                configs=configs,
+                firewalls=[MagicMock()],
+            ),
+        ]
+
+        service = _build_nb_service(nb_return=mock_nbs)
+        service._describe_nodebalancers()
+
+        assert len(service.nodebalancers) == 1
+        nb = service.nodebalancers[0]
+        assert nb.label == "prod-nb"
+        assert nb.region == "us-east"
+        assert nb.has_firewall is True
+        assert len(nb.configs) == 1
+        assert nb.configs[0].protocol == "https"
+
+    def test_describe_nodebalancers_no_firewall(self):
+        mock_nbs = [
+            _mock_nodebalancer(id=1, label="no-fw-nb", firewalls=[]),
+        ]
+
+        service = _build_nb_service(nb_return=mock_nbs)
+        service._describe_nodebalancers()
+
+        assert len(service.nodebalancers) == 1
+        assert service.nodebalancers[0].has_firewall is False
+
+    def test_describe_nodebalancers_handles_empty_list(self):
+        service = _build_nb_service(nb_return=[])
+        service._describe_nodebalancers()
+
+        assert len(service.nodebalancers) == 0
+
+    def test_describe_nodebalancers_handles_api_error(self):
+        service = _build_nb_service(nb_side_effect=Exception("API error"))
+        service._describe_nodebalancers()
+
+        assert len(service.nodebalancers) == 0
+
+    def test_describe_nodebalancers_missing_scope(self):
+        error = ApiError(
+            "Your OAuth token is not authorized to use this endpoint.",
+            status=401,
+        )
+        service = _build_nb_service(nb_side_effect=error)
+
+        with patch(
+            "prowler.providers.linode.lib.service.service.logger"
+        ) as logger_mock:
+            service._describe_nodebalancers()
+
+        assert len(service.nodebalancers) == 0
+        logged = " ".join(str(c) for c in logger_mock.error.call_args_list)
+        assert "LinodeMissingPermissionError" in logged
+        assert "nodebalancers:read_only" in logged

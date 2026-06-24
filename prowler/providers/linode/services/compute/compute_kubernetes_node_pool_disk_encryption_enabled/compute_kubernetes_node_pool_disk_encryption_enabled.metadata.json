@@ -1,0 +1,36 @@
+{
+  "Provider": "linode",
+  "CheckID": "compute_kubernetes_node_pool_disk_encryption_enabled",
+  "CheckTitle": "LKE node pool disk encryption is enabled",
+  "CheckType": [],
+  "ServiceName": "compute",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "NotDefined",
+  "ResourceGroup": "compute",
+  "Description": "Linode **LKE node pool disk encryption is enabled**.",
+  "Risk": "Risk if not configured.",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://techdocs.akamai.com/cloud-computing/docs/getting-started-with-lke"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Review the compute configuration.",
+      "Url": "https://hub.prowler.com/check/compute_kubernetes_node_pool_disk_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

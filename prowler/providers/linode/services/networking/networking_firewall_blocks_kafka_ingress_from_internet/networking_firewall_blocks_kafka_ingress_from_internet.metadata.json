@@ -1,0 +1,34 @@
+{
+  "Provider": "linode",
+  "CheckID": "networking_firewall_blocks_kafka_ingress_from_internet",
+  "CheckTitle": "Firewall blocks Kafka ingress from the internet",
+  "CheckType": [],
+  "ServiceName": "networking",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "NotDefined",
+  "ResourceGroup": "network",
+  "Description": "Linode Firewalls are checked to ensure they block **Kafka** (port(s) [9092]) ingress from the internet (0.0.0.0/0 and ::/0).",
+  "Risk": "Allowing unrestricted Kafka access from the internet exposes services to **brute-force attacks** and **exploitation**.",
+  "RelatedUrl": "",
+  "AdditionalURLs": [],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Review the networking configuration.",
+      "Url": "https://hub.prowler.com/check/networking_firewall_blocks_kafka_ingress_from_internet"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

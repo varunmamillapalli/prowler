@@ -7,7 +7,9 @@ from prowler.lib.check.models import CheckMetadata
 EXPECTED_SERVICE_NAMES = {
     "administration": "administration",
     "compute": "compute",
+    "databases": "databases",
     "networking": "networking",
+    "storage": "storage",
 }
 
 

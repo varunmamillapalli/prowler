@@ -141,3 +141,139 @@ class TestLinodeComputeService:
         service._describe_instances()
 
         assert len(service.instances) == 2
+
+
+def _mock_lke_cluster(
+    id=1,
+    label="my-cluster",
+    region="us-east",
+    k8s_version="1.30",
+    tier="standard",
+    high_availability=False,
+    acl_enabled=False,
+    acl_addresses_ipv4=None,
+    acl_addresses_ipv6=None,
+    pools=None,
+    tags=None,
+):
+    cluster = MagicMock()
+    cluster.id = id
+    cluster.label = label
+    region_mock = MagicMock()
+    region_mock.id = region
+    cluster.region = region_mock
+    kv = MagicMock()
+    kv.id = k8s_version
+    cluster.k8s_version = kv
+    cluster.tier = tier
+    cluster.tags = tags or []
+
+    cp = MagicMock()
+    cp.high_availability = high_availability
+    cluster.control_plane = cp
+
+    acl = MagicMock()
+    acl.enabled = acl_enabled
+    addrs = MagicMock()
+    addrs.ipv4 = acl_addresses_ipv4 or []
+    addrs.ipv6 = acl_addresses_ipv6 or []
+    acl.addresses = addrs
+    cluster.control_plane_acl = acl
+
+    cluster.pools = pools or []
+    return cluster
+
+
+def _mock_node_pool(
+    id=1, count=3, disk_encryption="enabled", autoscaler_enabled=False, tags=None
+):
+    pool = MagicMock()
+    pool.id = id
+    pool.count = count
+    pool.disk_encryption = disk_encryption
+    autoscaler = MagicMock()
+    autoscaler.enabled = autoscaler_enabled
+    pool.autoscaler = autoscaler
+    pool.tags = tags or []
+    return pool
+
+
+def _build_lke_service(lke_clusters_return=None, lke_clusters_side_effect=None):
+    """Build a ComputeService with a mock for client.lke.clusters()."""
+    service = object.__new__(ComputeService)
+    service.instances = []
+    service.lke_clusters = []
+
+    clusters_callable = MagicMock()
+    if lke_clusters_side_effect:
+        clusters_callable.side_effect = lke_clusters_side_effect
+    else:
+        clusters_callable.return_value = lke_clusters_return or []
+
+    lke_mock = MagicMock()
+    lke_mock.clusters = clusters_callable
+
+    client_mock = MagicMock()
+    client_mock.lke = lke_mock
+    service.client = client_mock
+    return service
+
+
+class TestLinodeComputeServiceLKE:
+    def test_describe_lke_clusters_parses_correctly(self):
+        pools = [_mock_node_pool(id=10, count=3, disk_encryption="enabled")]
+        mock_clusters = [
+            _mock_lke_cluster(
+                id=1,
+                label="prod-cluster",
+                region="us-east",
+                k8s_version="1.30",
+                high_availability=True,
+                acl_enabled=True,
+                acl_addresses_ipv4=["10.0.0.0/8"],
+                pools=pools,
+            ),
+        ]
+
+        service = _build_lke_service(lke_clusters_return=mock_clusters)
+        service._describe_lke_clusters()
+
+        assert len(service.lke_clusters) == 1
+        cluster = service.lke_clusters[0]
+        assert cluster.label == "prod-cluster"
+        assert cluster.region == "us-east"
+        assert cluster.k8s_version == "1.30"
+        assert cluster.high_availability is True
+        assert cluster.acl_enabled is True
+        assert cluster.acl_addresses_ipv4 == ["10.0.0.0/8"]
+        assert len(cluster.node_pools) == 1
+        assert cluster.node_pools[0].disk_encryption == "enabled"
+
+    def test_describe_lke_clusters_handles_empty_list(self):
+        service = _build_lke_service(lke_clusters_return=[])
+        service._describe_lke_clusters()
+
+        assert len(service.lke_clusters) == 0
+
+    def test_describe_lke_clusters_handles_api_error(self):
+        service = _build_lke_service(lke_clusters_side_effect=Exception("API error"))
+        service._describe_lke_clusters()
+
+        assert len(service.lke_clusters) == 0
+
+    def test_describe_lke_clusters_missing_scope(self):
+        error = ApiError(
+            "Your OAuth token is not authorized to use this endpoint.",
+            status=401,
+        )
+        service = _build_lke_service(lke_clusters_side_effect=error)
+
+        with patch(
+            "prowler.providers.linode.lib.service.service.logger"
+        ) as logger_mock:
+            service._describe_lke_clusters()
+
+        assert len(service.lke_clusters) == 0
+        logged = " ".join(str(c) for c in logger_mock.error.call_args_list)
+        assert "LinodeMissingPermissionError" in logged
+        assert "lke:read_only" in logged

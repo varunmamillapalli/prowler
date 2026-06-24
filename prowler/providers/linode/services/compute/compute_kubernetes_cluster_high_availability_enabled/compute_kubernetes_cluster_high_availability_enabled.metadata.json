@@ -1,0 +1,36 @@
+{
+  "Provider": "linode",
+  "CheckID": "compute_kubernetes_cluster_high_availability_enabled",
+  "CheckTitle": "LKE cluster control plane has HA enabled",
+  "CheckType": [],
+  "ServiceName": "compute",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "NotDefined",
+  "ResourceGroup": "compute",
+  "Description": "Linode **LKE cluster control plane has HA enabled**.",
+  "Risk": "Risk if not configured.",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://techdocs.akamai.com/cloud-computing/docs/getting-started-with-lke"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Review the compute configuration.",
+      "Url": "https://hub.prowler.com/check/compute_kubernetes_cluster_high_availability_enabled"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

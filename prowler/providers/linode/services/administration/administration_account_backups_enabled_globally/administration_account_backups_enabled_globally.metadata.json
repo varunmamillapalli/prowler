@@ -1,0 +1,34 @@
+{
+  "Provider": "linode",
+  "CheckID": "administration_account_backups_enabled_globally",
+  "CheckTitle": "Account has automatic backups enabled globally",
+  "CheckType": [],
+  "ServiceName": "administration",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "NotDefined",
+  "ResourceGroup": "IAM",
+  "Description": "Linode **account settings** are checked to ensure **automatic backups** are enabled globally.",
+  "Risk": "Without backups, data loss from instance failures or accidental deletion is **unrecoverable**.",
+  "RelatedUrl": "",
+  "AdditionalURLs": [],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Review the administration configuration.",
+      "Url": "https://hub.prowler.com/check/administration_account_backups_enabled_globally"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

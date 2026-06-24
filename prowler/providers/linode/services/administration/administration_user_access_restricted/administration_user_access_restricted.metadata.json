@@ -1,0 +1,34 @@
+{
+  "Provider": "linode",
+  "CheckID": "administration_user_access_restricted",
+  "CheckTitle": "User account has restricted access",
+  "CheckType": [],
+  "ServiceName": "administration",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "NotDefined",
+  "ResourceGroup": "IAM",
+  "Description": "Linode **user accounts** are checked to ensure they have **restricted** access, following least-privilege principles.",
+  "Risk": "Unrestricted users have full account access, increasing the blast radius of a **credential compromise**.",
+  "RelatedUrl": "",
+  "AdditionalURLs": [],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Review the administration configuration.",
+      "Url": "https://hub.prowler.com/check/administration_user_access_restricted"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,34 @@
+{
+  "Provider": "linode",
+  "CheckID": "networking_nodebalancer_https_enabled",
+  "CheckTitle": "NodeBalancer uses HTTPS for traffic",
+  "CheckType": [],
+  "ServiceName": "networking",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "NotDefined",
+  "ResourceGroup": "network",
+  "Description": "Linode **NodeBalancers** are checked to ensure they use **HTTPS** or **TCP with SSL** for traffic encryption.",
+  "Risk": "Without HTTPS, traffic is sent in plaintext exposing it to **eavesdropping** and **man-in-the-middle attacks**.",
+  "RelatedUrl": "",
+  "AdditionalURLs": [],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Review the networking configuration.",
+      "Url": "https://hub.prowler.com/check/networking_nodebalancer_https_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

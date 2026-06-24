@@ -33,13 +33,42 @@ class Firewall(BaseModel):
     tags: List[str] = []
 
 
+class NodeBalancerConfig(BaseModel):
+    """Model for a single NodeBalancer config (port)."""
+
+    id: int
+    port: int = 80
+    protocol: str = "http"
+    algorithm: str = "roundrobin"
+    stickiness: str = "none"
+    check: str = "none"
+    cipher_suite: str = "recommended"
+    proxy_protocol: str = "none"
+    ssl_commonname: str = ""
+    ssl_fingerprint: str = ""
+
+
+class NodeBalancer(BaseModel):
+    """Model for a Linode NodeBalancer."""
+
+    id: int
+    label: str
+    region: str = "global"
+    status: str = "unknown"
+    configs: List[NodeBalancerConfig] = []
+    has_firewall: bool = False
+    tags: List[str] = []
+
+
 class NetworkingService(LinodeService):
-    """Service to interact with Linode Cloud Firewalls."""
+    """Service to interact with Linode Cloud Firewalls and NodeBalancers."""
 
     def __init__(self, provider):
         super().__init__("networking", provider)
         self.firewalls: List[Firewall] = []
+        self.nodebalancers: List[NodeBalancer] = []
         self._describe_firewalls()
+        self._describe_nodebalancers()
 
     def _describe_firewalls(self):
         """Fetch all Linode Cloud Firewalls with their rules."""
@@ -125,3 +154,79 @@ class NetworkingService(LinodeService):
                     )
         except Exception as error:
             self._log_fetch_error("firewalls", "firewall:read_only", error)
+
+    def _describe_nodebalancers(self):
+        """Fetch all Linode NodeBalancers with their configs."""
+        try:
+            raw_nbs = self.client.nodebalancers()
+            for nb in raw_nbs:
+                try:
+                    region = "global"
+                    try:
+                        r = getattr(nb, "region", None)
+                        if r:
+                            region = r.id if hasattr(r, "id") else str(r)
+                    except Exception:
+                        pass
+
+                    configs = []
+                    try:
+                        for cfg in nb.configs:
+                            configs.append(
+                                NodeBalancerConfig(
+                                    id=getattr(cfg, "id", 0),
+                                    port=getattr(cfg, "port", 80) or 80,
+                                    protocol=(
+                                        getattr(cfg, "protocol", "http") or "http"
+                                    ).lower(),
+                                    algorithm=getattr(cfg, "algorithm", "roundrobin")
+                                    or "roundrobin",
+                                    stickiness=getattr(cfg, "stickiness", "none")
+                                    or "none",
+                                    check=getattr(cfg, "check", "none") or "none",
+                                    cipher_suite=getattr(
+                                        cfg, "cipher_suite", "recommended"
+                                    )
+                                    or "recommended",
+                                    proxy_protocol=getattr(
+                                        cfg, "proxy_protocol", "none"
+                                    )
+                                    or "none",
+                                    ssl_commonname=getattr(cfg, "ssl_commonname", "")
+                                    or "",
+                                    ssl_fingerprint=getattr(cfg, "ssl_fingerprint", "")
+                                    or "",
+                                )
+                            )
+                    except Exception as error:
+                        logger.warning(
+                            f"nodebalancer - Unable to fetch configs for NodeBalancer {nb.id}: {error}"
+                        )
+
+                    has_firewall = False
+                    try:
+                        firewalls = nb.firewalls()
+                        has_firewall = len(firewalls) > 0
+                    except Exception as error:
+                        logger.warning(
+                            f"nodebalancer - Unable to fetch firewalls for NodeBalancer {nb.id}: {error}"
+                        )
+
+                    self.nodebalancers.append(
+                        NodeBalancer(
+                            id=nb.id,
+                            label=nb.label or f"nodebalancer-{nb.id}",
+                            region=region,
+                            status=getattr(nb, "status", "unknown") or "unknown",
+                            configs=configs,
+                            has_firewall=has_firewall,
+                            tags=nb.tags or [],
+                        )
+                    )
+                except Exception as error:
+                    logger.error(
+                        f"nodebalancer - Error processing NodeBalancer {nb.id}: "
+                        f"{error.__class__.__name__}[{error.__traceback__.tb_lineno}]: {error}"
+                    )
+        except Exception as error:
+            self._log_fetch_error("nodebalancers", "nodebalancers:read_only", error)

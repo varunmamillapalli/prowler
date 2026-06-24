@@ -1,0 +1,34 @@
+{
+  "Provider": "linode",
+  "CheckID": "networking_nodebalancer_has_firewall_attached",
+  "CheckTitle": "NodeBalancer has a firewall attached",
+  "CheckType": [],
+  "ServiceName": "networking",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "NotDefined",
+  "ResourceGroup": "network",
+  "Description": "Linode **NodeBalancers** are checked to ensure they have a **Cloud Firewall** attached for network-level protection.",
+  "Risk": "Without a firewall, the NodeBalancer is directly exposed to all internet traffic with no network-level filtering.",
+  "RelatedUrl": "",
+  "AdditionalURLs": [],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Review the networking configuration.",
+      "Url": "https://hub.prowler.com/check/networking_nodebalancer_has_firewall_attached"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

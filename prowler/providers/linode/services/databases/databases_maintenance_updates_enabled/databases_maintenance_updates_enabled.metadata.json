@@ -1,0 +1,36 @@
+{
+  "Provider": "linode",
+  "CheckID": "databases_maintenance_updates_enabled",
+  "CheckTitle": "Managed Database has maintenance updates configured",
+  "CheckType": [],
+  "ServiceName": "databases",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "NotDefined",
+  "ResourceGroup": "database",
+  "Description": "Linode **Managed Database has maintenance updates configured**.",
+  "Risk": "Risk if not configured.",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://techdocs.akamai.com/cloud-computing/docs/managed-databases"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Review the databases configuration.",
+      "Url": "https://hub.prowler.com/check/databases_maintenance_updates_enabled"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

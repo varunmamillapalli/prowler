@@ -17,6 +17,11 @@ Prowler requires read-only access to your Linode account. The following OAuth sc
 | `account` | `Read Only` | Required to list users and verify account identity |
 | `linodes` | `Read Only` | Required to list instances and their configurations |
 | `firewall` | `Read Only` | Required to list firewalls and their rules |
+| `nodebalancers` | `Read Only` | Required to list NodeBalancers and their configurations |
+| `volumes` | `Read Only` | Required to list Block Storage volumes |
+| `object_storage` | `Read Only` | Required to list Object Storage buckets and keys |
+| `lke` | `Read Only` | Required to list LKE clusters and node pools |
+| `databases` | `Read Only` | Required to list managed database instances |
 
 <Warning>
 Ensure the token has all required scopes. Missing permissions will cause some checks to fail or return incomplete results.
@@ -38,6 +43,11 @@ Ensure the token has all required scopes. Missing permissions will cause some ch
      - Account
      - Linodes
      - Firewall
+     - NodeBalancers
+     - Volumes
+     - Object Storage
+     - Kubernetes (LKE)
+     - Databases
    - All other scopes can be set to **No Access**
 5. Click **Create Token**.
 6. Copy the token immediately — it will not be shown again.

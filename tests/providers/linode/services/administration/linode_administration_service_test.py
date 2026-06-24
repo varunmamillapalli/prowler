@@ -100,3 +100,64 @@ class TestLinodeAdministrationService:
         logged = " ".join(str(c) for c in logger_mock.error.call_args_list)
         assert "LinodeMissingPermissionError" in logged
         assert "account:read_only" in logged
+
+
+def _build_settings_service(settings_return=None, settings_side_effect=None):
+    """Build an AdministrationService with a mock for account.settings()."""
+    service = object.__new__(AdministrationService)
+    service.users = []
+    service.account_settings = None
+
+    settings_callable = MagicMock()
+    if settings_side_effect:
+        settings_callable.side_effect = settings_side_effect
+    else:
+        settings_callable.return_value = settings_return
+
+    account_mock = MagicMock()
+    account_mock.settings = settings_callable
+
+    client_mock = MagicMock()
+    client_mock.account = account_mock
+    service.client = client_mock
+    return service
+
+
+class TestLinodeAdministrationServiceAccountSettings:
+    def test_describe_account_settings_parses_correctly(self):
+        raw = MagicMock()
+        raw.backups_enabled = True
+        raw.managed = False
+        raw.network_helper = True
+        raw.object_storage = "active"
+
+        service = _build_settings_service(settings_return=raw)
+        service._describe_account_settings()
+
+        assert service.account_settings is not None
+        assert service.account_settings.backups_enabled is True
+        assert service.account_settings.managed is False
+        assert service.account_settings.network_helper is True
+        assert service.account_settings.object_storage == "active"
+
+    def test_describe_account_settings_handles_api_error(self):
+        service = _build_settings_service(settings_side_effect=Exception("API error"))
+        service._describe_account_settings()
+
+        assert service.account_settings is None
+
+    def test_describe_account_settings_missing_scope(self):
+        error = ApiError(
+            "Your OAuth token is not authorized to use this endpoint.",
+            status=401,
+        )
+        service = _build_settings_service(settings_side_effect=error)
+
+        with patch(
+            "prowler.providers.linode.lib.service.service.logger"
+        ) as logger_mock:
+            service._describe_account_settings()
+
+        assert service.account_settings is None
+        logged = " ".join(str(c) for c in logger_mock.error.call_args_list)
+        assert "LinodeMissingPermissionError" in logged
