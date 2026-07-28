@@ -30,7 +30,7 @@ class Test_compute_kubernetes_cluster_high_availability_enabled:
 
             assert len(result) == 0
 
-    def test_pass(self):
+    def test_cluster_high_availability_enabled(self):
         compute_client = mock.MagicMock()
         compute_client.lke_clusters = [
             LKECluster(
@@ -69,7 +69,7 @@ class Test_compute_kubernetes_cluster_high_availability_enabled:
             assert result[0].resource_id == "500"
             assert result[0].resource_name == "ha-cluster"
 
-    def test_fail(self):
+    def test_cluster_high_availability_disabled(self):
         compute_client = mock.MagicMock()
         compute_client.lke_clusters = [
             LKECluster(

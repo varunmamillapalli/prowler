@@ -30,7 +30,7 @@ class Test_databases_allow_list_configured:
 
             assert len(result) == 0
 
-    def test_pass(self):
+    def test_allow_list_configured(self):
         databases_client = mock.MagicMock()
         databases_client.databases = [
             Database(
@@ -69,7 +69,7 @@ class Test_databases_allow_list_configured:
             assert result[0].resource_id == "600"
             assert result[0].resource_name == "restricted-db"
 
-    def test_fail(self):
+    def test_allow_list_empty(self):
         databases_client = mock.MagicMock()
         databases_client.databases = [
             Database(

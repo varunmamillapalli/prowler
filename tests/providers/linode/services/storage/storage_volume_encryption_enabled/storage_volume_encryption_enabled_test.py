@@ -30,7 +30,7 @@ class Test_storage_volume_encryption_enabled:
 
             assert len(result) == 0
 
-    def test_pass(self):
+    def test_volume_encryption_enabled(self):
         storage_client = mock.MagicMock()
         storage_client.volumes = [
             Volume(
@@ -67,7 +67,7 @@ class Test_storage_volume_encryption_enabled:
             assert result[0].resource_id == "300"
             assert result[0].resource_name == "encrypted-vol"
 
-    def test_fail(self):
+    def test_volume_encryption_disabled(self):
         storage_client = mock.MagicMock()
         storage_client.volumes = [
             Volume(

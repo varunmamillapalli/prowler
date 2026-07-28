@@ -31,7 +31,7 @@ class Test_databases_maintenance_updates_enabled:
 
             assert len(result) == 0
 
-    def test_pass(self):
+    def test_maintenance_window_configured(self):
         databases_client = mock.MagicMock()
         databases_client.databases = [
             Database(
@@ -75,7 +75,7 @@ class Test_databases_maintenance_updates_enabled:
             assert result[0].status == "PASS"
             assert result[0].resource_id == "600"
 
-    def test_fail(self):
+    def test_maintenance_window_not_configured(self):
         databases_client = mock.MagicMock()
         databases_client.databases = [
             Database(

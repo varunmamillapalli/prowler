@@ -30,7 +30,7 @@ class Test_compute_kubernetes_cluster_acl_restricted:
 
             assert len(result) == 0
 
-    def test_pass(self):
+    def test_cluster_acl_restricted(self):
         compute_client = mock.MagicMock()
         compute_client.lke_clusters = [
             LKECluster(
@@ -69,7 +69,7 @@ class Test_compute_kubernetes_cluster_acl_restricted:
             assert result[0].resource_id == "500"
             assert result[0].resource_name == "restricted-cluster"
 
-    def test_fail(self):
+    def test_cluster_acl_open_to_internet(self):
         compute_client = mock.MagicMock()
         compute_client.lke_clusters = [
             LKECluster(

@@ -12,16 +12,18 @@
   "Description": "Linode **account settings** are checked to ensure **automatic backups** are enabled globally.",
   "Risk": "Without backups, data loss from instance failures or accidental deletion is **unrecoverable**.",
   "RelatedUrl": "",
-  "AdditionalURLs": [],
+  "AdditionalURLs": [
+    "https://techdocs.akamai.com/cloud-computing/docs/enable-backups#auto-enroll-new-compute-instance-in-the-backups-service"
+  ],
   "Remediation": {
     "Code": {
       "CLI": "",
       "NativeIaC": "",
-      "Other": "",
+      "Other": "1. Log in to the Linode Cloud Manager\n2. Navigate to Account Setting under Administration\n3. Click the switch under the Backup Auto Enrollment panel",
       "Terraform": ""
     },
     "Recommendation": {
-      "Text": "Review the administration configuration.",
+      "Text": "Enable Backup Auto Enrollment in account settings to enroll new Linodes in backups automatically.",
       "Url": "https://hub.prowler.com/check/administration_account_backups_enabled_globally"
     }
   },

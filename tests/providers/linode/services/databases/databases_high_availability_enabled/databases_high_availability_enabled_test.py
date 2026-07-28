@@ -30,7 +30,7 @@ class Test_databases_high_availability_enabled:
 
             assert len(result) == 0
 
-    def test_pass(self):
+    def test_high_availability_enabled(self):
         databases_client = mock.MagicMock()
         databases_client.databases = [
             Database(
@@ -69,7 +69,7 @@ class Test_databases_high_availability_enabled:
             assert result[0].resource_id == "600"
             assert result[0].resource_name == "ha-db"
 
-    def test_fail(self):
+    def test_high_availability_disabled(self):
         databases_client = mock.MagicMock()
         databases_client.databases = [
             Database(

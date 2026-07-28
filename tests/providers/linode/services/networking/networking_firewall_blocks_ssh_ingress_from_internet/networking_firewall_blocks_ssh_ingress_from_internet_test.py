@@ -31,7 +31,7 @@ class Test_networking_firewall_blocks_ssh_ingress_from_internet:
 
             assert len(result) == 0
 
-    def test_pass(self):
+    def test_ssh_port_blocked(self):
         networking_client = mock.MagicMock()
         networking_client.firewalls = [
             Firewall(
@@ -78,7 +78,7 @@ class Test_networking_firewall_blocks_ssh_ingress_from_internet:
             assert result[0].resource_id == "100"
             assert result[0].resource_name == "secure-fw"
 
-    def test_fail(self):
+    def test_ssh_port_open_to_internet(self):
         networking_client = mock.MagicMock()
         networking_client.firewalls = [
             Firewall(

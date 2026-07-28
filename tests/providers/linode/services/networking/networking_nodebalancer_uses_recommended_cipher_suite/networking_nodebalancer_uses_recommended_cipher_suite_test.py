@@ -31,7 +31,7 @@ class Test_networking_nodebalancer_uses_recommended_cipher_suite:
 
             assert len(result) == 0
 
-    def test_pass(self):
+    def test_recommended_cipher_suite(self):
         networking_client = mock.MagicMock()
         networking_client.nodebalancers = [
             NodeBalancer(
@@ -80,7 +80,7 @@ class Test_networking_nodebalancer_uses_recommended_cipher_suite:
             assert result[0].resource_id == "200"
             assert result[0].resource_name == "secure-nb"
 
-    def test_fail(self):
+    def test_legacy_cipher_suite(self):
         networking_client = mock.MagicMock()
         networking_client.nodebalancers = [
             NodeBalancer(

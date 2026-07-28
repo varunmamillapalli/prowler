@@ -12,16 +12,18 @@
   "Description": "Linode **user accounts** are checked to ensure they have **restricted** access, following least-privilege principles.",
   "Risk": "Unrestricted users have full account access, increasing the blast radius of a **credential compromise**.",
   "RelatedUrl": "",
-  "AdditionalURLs": [],
+  "AdditionalURLs": [
+    "https://techdocs.akamai.com/cloud-computing/docs/identity-access-cm-manage-access"
+  ],
   "Remediation": {
     "Code": {
       "CLI": "",
       "NativeIaC": "",
-      "Other": "",
+      "Other": "1. Log in to the Linode Cloud Manager\n2. Navigate to Identity & Access under Administration\n3. Click on the user and go to Assigned Roles tab to update access permissions",
       "Terraform": ""
     },
     "Recommendation": {
-      "Text": "Review the administration configuration.",
+      "Text": "Review each user in the account and ensure they only have access to required entities.",
       "Url": "https://hub.prowler.com/check/administration_user_access_restricted"
     }
   },

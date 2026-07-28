@@ -14,14 +14,14 @@ Prowler requires read-only access to your Linode account. The following OAuth sc
 
 | Scope | Access | Description |
 |-------|--------|-------------|
-| `account` | `Read Only` | Required to list users and verify account identity |
-| `linodes` | `Read Only` | Required to list instances and their configurations |
-| `firewall` | `Read Only` | Required to list firewalls and their rules |
-| `nodebalancers` | `Read Only` | Required to list NodeBalancers and their configurations |
-| `volumes` | `Read Only` | Required to list Block Storage volumes |
-| `object_storage` | `Read Only` | Required to list Object Storage buckets and keys |
-| `lke` | `Read Only` | Required to list LKE clusters and node pools |
-| `databases` | `Read Only` | Required to list managed database instances |
+| `Account` | `Read Only` | Required to list users and verify account identity |
+| `Linodes` | `Read Only` | Required to list instances and their configurations |
+| `Firewalls` | `Read Only` | Required to list firewalls and their rules |
+| `NodeBalancers` | `Read Only` | Required to list NodeBalancers and their configurations |
+| `Volumes` | `Read Only` | Required to list Block Storage volumes |
+| `Object Storage` | `Read Only` | Required to list Object Storage buckets and keys |
+| `Kubernetes` | `Read Only` | Required to list LKE clusters and node pools |
+| `Databases` | `Read Only` | Required to list managed database instances |
 
 <Warning>
 Ensure the token has all required scopes. Missing permissions will cause some checks to fail or return incomplete results.
@@ -42,11 +42,11 @@ Ensure the token has all required scopes. Missing permissions will cause some ch
    - **Permissions:** Set the following scopes to **Read Only**:
      - Account
      - Linodes
-     - Firewall
+     - Firewalls
      - NodeBalancers
      - Volumes
      - Object Storage
-     - Kubernetes (LKE)
+     - Kubernetes (Linode Kubernetes Engine)
      - Databases
    - All other scopes can be set to **No Access**
 5. Click **Create Token**.

@@ -31,7 +31,7 @@ class Test_networking_nodebalancer_https_enabled:
 
             assert len(result) == 0
 
-    def test_pass(self):
+    def test_nodebalancer_https_enabled(self):
         networking_client = mock.MagicMock()
         networking_client.nodebalancers = [
             NodeBalancer(
@@ -80,7 +80,7 @@ class Test_networking_nodebalancer_https_enabled:
             assert result[0].resource_id == "200"
             assert result[0].resource_name == "secure-nb"
 
-    def test_fail(self):
+    def test_nodebalancer_http_only(self):
         networking_client = mock.MagicMock()
         networking_client.nodebalancers = [
             NodeBalancer(

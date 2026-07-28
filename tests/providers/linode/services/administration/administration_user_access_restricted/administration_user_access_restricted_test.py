@@ -30,7 +30,7 @@ class Test_administration_user_access_restricted:
 
             assert len(result) == 0
 
-    def test_pass(self):
+    def test_user_access_restricted(self):
         administration_client = mock.MagicMock()
         administration_client.users = [
             User(
@@ -63,7 +63,7 @@ class Test_administration_user_access_restricted:
             assert result[0].resource_id == "restricted-user"
             assert result[0].resource_name == "restricted-user"
 
-    def test_fail(self):
+    def test_user_access_unrestricted(self):
         administration_client = mock.MagicMock()
         administration_client.users = [
             User(

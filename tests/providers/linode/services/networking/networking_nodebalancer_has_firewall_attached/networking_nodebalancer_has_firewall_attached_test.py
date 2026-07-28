@@ -30,7 +30,7 @@ class Test_networking_nodebalancer_has_firewall_attached:
 
             assert len(result) == 0
 
-    def test_pass(self):
+    def test_nodebalancer_firewall_attached(self):
         networking_client = mock.MagicMock()
         networking_client.nodebalancers = [
             NodeBalancer(
@@ -66,7 +66,7 @@ class Test_networking_nodebalancer_has_firewall_attached:
             assert result[0].resource_id == "200"
             assert result[0].resource_name == "secure-nb"
 
-    def test_fail(self):
+    def test_nodebalancer_no_firewall_attached(self):
         networking_client = mock.MagicMock()
         networking_client.nodebalancers = [
             NodeBalancer(

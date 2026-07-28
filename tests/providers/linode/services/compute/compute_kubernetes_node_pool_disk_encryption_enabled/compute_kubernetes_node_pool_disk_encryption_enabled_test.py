@@ -31,7 +31,7 @@ class Test_compute_kubernetes_node_pool_disk_encryption_enabled:
 
             assert len(result) == 0
 
-    def test_pass(self):
+    def test_node_pool_disk_encryption_enabled(self):
         compute_client = mock.MagicMock()
         compute_client.lke_clusters = [
             LKECluster(
@@ -75,7 +75,7 @@ class Test_compute_kubernetes_node_pool_disk_encryption_enabled:
             assert result[0].resource_id == "10"
             assert result[0].resource_name == "test-cluster/pool-10"
 
-    def test_fail(self):
+    def test_node_pool_disk_encryption_disabled(self):
         compute_client = mock.MagicMock()
         compute_client.lke_clusters = [
             LKECluster(
