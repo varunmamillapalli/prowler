@@ -35,8 +35,8 @@ vi.mock("@/actions/findings", async () => {
 });
 
 import { useGraphStore } from "./_hooks/use-graph-state";
-import { getPathEdges } from "./_lib";
-import { isFindingNode, layoutWithDagre } from "./_lib/layout";
+import { getPathEdges, isProwlerFindingNode } from "./_lib";
+import { layoutWithDagre } from "./_lib/layout";
 import AttackPathsPage from "./attack-paths-page";
 import { fixtures, type PageFixture } from "./attack-paths-page.fixtures";
 import { AttackPathPageHarness } from "./attack-paths-page.harness";
@@ -101,6 +101,31 @@ describe("waiting states", () => {
 });
 
 describe("running a query", () => {
+  test("the query builder surface uses the shared card primitive", async ({
+    mountWith,
+  }) => {
+    const graph = await mountWith();
+
+    const card = await graph.waitFor(() => graph.queryBuilderCard, 10000);
+
+    expect(card).toHaveAttribute("data-slot", "card");
+    expect(card).toHaveClass("rounded-xl");
+  });
+
+  test("a parameterized query shows its required inputs after selection", async ({
+    mountWith,
+  }) => {
+    const graph = await mountWith(fixtures.parameterizedQuery());
+
+    await graph.selectQuery();
+
+    expect(graph.containsText(/Query Parameters/i)).toBe(true);
+    expect(graph.containsText(/Tag key/i)).toBe(true);
+    expect(graph.getInputByName("tag_key")).toBeTruthy();
+    expect(graph.containsText(/Tag value/i)).toBe(true);
+    expect(graph.getInputByName("tag_value")).toBeTruthy();
+  });
+
   test("the graph renders with a background, a minimap, and a viewport", async ({
     mountWith,
   }) => {
@@ -243,7 +268,7 @@ describe("running a query", () => {
     if (!fixture.queryResult) throw new Error("Expected graph fixture data");
 
     const visibleNodes = fixture.queryResult.nodes.filter(
-      (node) => !isFindingNode(node.labels),
+      (node) => !isProwlerFindingNode(node.labels),
     );
     const visibleNodeIds = new Set(visibleNodes.map((node) => node.id));
     const visibleEdges = (fixture.queryResult.relationships ?? [])
@@ -452,7 +477,7 @@ describe("exploring the graph", () => {
 
     const findingIds = new Set(
       (fixture.queryResult?.nodes ?? [])
-        .filter((node) => isFindingNode(node.labels))
+        .filter((node) => isProwlerFindingNode(node.labels))
         .map((node) => node.id),
     );
     const visibleEdges = (fixture.queryResult?.relationships ?? [])

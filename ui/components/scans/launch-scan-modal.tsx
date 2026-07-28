@@ -11,17 +11,24 @@ import { z } from "zod";
 import { scanOnDemand } from "@/actions/scans";
 import { getSchedule } from "@/actions/schedules";
 import { AccountsSelector } from "@/app/(prowler)/_overview/_components/accounts-selector";
-import { Field, FieldError, FieldLabel, Input } from "@/components/shadcn";
+import {
+  Badge,
+  Field,
+  FieldError,
+  FieldLabel,
+  Input,
+} from "@/components/shadcn";
+import { FormButtons } from "@/components/shadcn/form";
 import { Modal } from "@/components/shadcn/modal";
 import {
   RadioGroup,
   RadioGroupItem,
 } from "@/components/shadcn/radio-group/radio-group";
-import { CloudFeatureBadgeLink } from "@/components/shared/cloud-feature-badge";
-import { FormButtons } from "@/components/ui/form";
-import { toast, ToastAction } from "@/components/ui/toast";
+import { toast, ToastAction } from "@/components/shadcn/toast";
+import { UsageLimitMessage } from "@/components/shared/usage-limit-message";
 import { getActionErrorMessage, hasActionError } from "@/lib/action-errors";
 import {
+  buildScheduleAttributesFromProvider,
   getScanScheduleCapability,
   getScheduleFormDefaults,
   getScheduleFormValues,
@@ -109,11 +116,13 @@ function LaunchScanForm({
   const requestedProviderRef = useRef<string>("");
 
   const isAdvanced = capability === SCAN_SCHEDULE_CAPABILITY.ADVANCED;
+  const isDailyLegacy = capability === SCAN_SCHEDULE_CAPABILITY.DAILY_LEGACY;
+  const canUseScheduleMode = isAdvanced || isDailyLegacy;
   const isManualOnly = capability === SCAN_SCHEDULE_CAPABILITY.MANUAL_ONLY;
   const isBlocked =
     capability === SCAN_SCHEDULE_CAPABILITY.BLOCKED ||
     (isManualOnly && isScanLimitReached);
-  const isScheduleMode = isAdvanced && mode === LAUNCH_MODE.SCHEDULE;
+  const isScheduleMode = canUseScheduleMode && mode === LAUNCH_MODE.SCHEDULE;
 
   // useWatch, not form.watch: form.watch re-renders are dropped by React Compiler memoization.
   const providerId = useWatch({ control: form.control, name: "providerId" });
@@ -123,10 +132,25 @@ function LaunchScanForm({
     .filter((provider) => provider.attributes.connection.connected !== true)
     .map((provider) => provider.id);
 
+  const getProviderScheduleAttributes = (id: string) => {
+    const selectedProvider = providers.find((provider) => provider.id === id);
+
+    return selectedProvider
+      ? buildScheduleAttributesFromProvider(selectedProvider.attributes)
+      : undefined;
+  };
+
   const loadSchedule = async (id: string) => {
     requestedProviderRef.current = id;
     if (!id) {
       setScheduleLoad(SCHEDULE_LOAD_STATE.IDLE);
+      return;
+    }
+
+    const providerScheduleAttributes = getProviderScheduleAttributes(id);
+    if (providerScheduleAttributes) {
+      scheduleForm.reset(getScheduleFormValues(providerScheduleAttributes));
+      setScheduleLoad(SCHEDULE_LOAD_STATE.LOADED);
       return;
     }
 
@@ -152,13 +176,15 @@ function LaunchScanForm({
 
   const handleProviderChange = (id: string) => {
     form.setValue("providerId", id, { shouldValidate: true });
-    if (isScheduleMode) void loadSchedule(id);
+    if (isScheduleMode && isAdvanced) void loadSchedule(id);
   };
 
   const handleModeChange = (nextMode: string) => {
-    if (nextMode === LAUNCH_MODE.SCHEDULE && !isAdvanced) return;
+    if (nextMode === LAUNCH_MODE.SCHEDULE && !canUseScheduleMode) return;
     setMode(nextMode as LaunchMode);
-    if (nextMode === LAUNCH_MODE.SCHEDULE) void loadSchedule(providerId);
+    if (nextMode === LAUNCH_MODE.SCHEDULE && isAdvanced) {
+      void loadSchedule(providerId);
+    }
   };
 
   const launchNow = form.handleSubmit(async ({ providerId, scanAlias }) => {
@@ -199,7 +225,7 @@ function LaunchScanForm({
   });
 
   const saveSchedule = async () => {
-    if (isBlocked || !isAdvanced) return;
+    if (isBlocked || !canUseScheduleMode) return;
 
     const providerValid = await form.trigger("providerId");
     if (!providerValid) return;
@@ -208,6 +234,7 @@ function LaunchScanForm({
       const result = await saveScheduleWithInitialScan({
         providerId: form.getValues("providerId"),
         values,
+        useLegacyDaily: isDailyLegacy,
       });
 
       if (result.status === SAVE_SCHEDULE_STATUS.ERROR) {
@@ -279,6 +306,9 @@ function LaunchScanForm({
           }
           selectedValues={providerId ? [providerId] : []}
           closeOnSelect
+          placeholder="Select a Provider"
+          emptySelectionLabel="No provider selected"
+          clearSelectionLabel="Clear provider selection"
         />
         {providerError && <FieldError>{providerError}</FieldError>}
       </Field>
@@ -300,20 +330,17 @@ function LaunchScanForm({
               <RadioGroupItem
                 value={LAUNCH_MODE.SCHEDULE}
                 aria-label="On a schedule"
-                disabled={!isAdvanced}
+                disabled={!canUseScheduleMode}
               />
               On a schedule
-              {!isAdvanced && <CloudFeatureBadgeLink size="sm" />}
+              {isDailyLegacy && (
+                <Badge variant="cloud" size="sm">
+                  Cloud
+                </Badge>
+              )}
             </label>
           </RadioGroup>
         </Field>
-      )}
-
-      {isBlocked && (
-        <p className="text-text-error-primary text-sm">
-          You have reached your scan limit, so additional scans are not
-          available right now.
-        </p>
       )}
 
       {!isScheduleMode && (
@@ -327,6 +354,8 @@ function LaunchScanForm({
           {aliasError && <FieldError>{aliasError}</FieldError>}
         </Field>
       )}
+
+      {isBlocked && <UsageLimitMessage />}
 
       {isScheduleMode && isScheduleLoading && (
         <div className="flex items-center gap-3 py-2">
@@ -347,6 +376,8 @@ function LaunchScanForm({
           disabled={isSubmitting || !providerId}
           showLaunchInitialScan
           showNextScheduledCopy
+          canUseAdvancedSchedule={isAdvanced}
+          showCloudUpgradeBadge={isDailyLegacy}
         />
       )}
 
@@ -365,7 +396,11 @@ function LaunchScanForm({
         }
         loadingText={isScheduleMode ? "Saving..." : "Launching..."}
         isDisabled={
-          isSubmitting || !providers.length || isScheduleLoading || isBlocked
+          isSubmitting ||
+          !providers.length ||
+          isScheduleLoading ||
+          isBlocked ||
+          (isScheduleMode && !providerId)
         }
         rightIcon={<Rocket className="size-4" />}
       />
